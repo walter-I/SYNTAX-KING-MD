@@ -1,7 +1,7 @@
 {
-  "name": "gaaju-md-ultra-deploy",
+  "name": "syntax-king-md",
   "version": "1.2.0",
-  "description": "GAAJU-MD WhatsApp Bot",
+  "description": "SYNTAX-KING-MD WhatsApp Bot",
   "engines": {
     "node": "20.x",
     "npm": ">=9"

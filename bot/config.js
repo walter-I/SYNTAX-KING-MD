@@ -12,10 +12,10 @@
 
         // ── Bot settings ────────────────────────────────────────────
         PREFIX:           process.env.PREFIX           || '.',
-        BOT_NAME:         process.env.BOT_NAME         || 'GAAJU-MD ULTRA',
-        OWNER_NAME:       process.env.OWNER_NAME       || 'ᴄʜʀɪs ɢᴀᴀᴊᴜ',
+        BOT_NAME:         process.env.BOT_NAME         || 'SYNTAX-KING-MD',
+        OWNER_NAME:       process.env.OWNER_NAME       || 'Syntax_king',
         MODE:             process.env.MODE             || 'public',
-        TIME_ZONE:        process.env.TIME_ZONE        || 'Africa/Lagos',
+        TIME_ZONE:        process.env.TIME_ZONE        || 'Africa/Nairobi',
         PORT:             parseInt(process.env.PORT)   || 3000,
 
         // WhatsApp Channel JID — shows menu as "Forwarded from <channel>"

@@ -9,7 +9,7 @@ function getBotName() {
             if (d.name) return d.name;
         }
     } catch (_) {}
-    return 'GAAJU-MD ULTRA';
+    return 'SYNTAX-KING-MD';
 }
 
 function setBotName(name) {

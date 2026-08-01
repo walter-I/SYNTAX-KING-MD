@@ -1,13 +1,13 @@
 <div align="center">
 
-  <img src="https://raw.githubusercontent.com/Xchristech2/GAAJU-MD-ULTRA/main/assets/xd-logo.jpg" width="180" style="border-radius:16px;" />
+  <img src="https://raw.githubusercontent.com/yourusername/SYNTAX-KING-MD/main/assets/xd-logo.jpg" width="180" style="border-radius:16px;" />
 
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=0,2,2,5,30&height=120&section=header&text=GAAJU-MD%20ULTRA&fontSize=42&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=WhatsApp%20Bot%20v1.2.0&descAlignY=60&descSize=18" width="100%"/>
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=0,2,2,5,30&height=120&section=header&text=SYNTAX-KING-MD&fontSize=42&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=WhatsApp%20Bot%20v1.2.0&descAlignY=60&descSize=18" width="100%"/>
 
   <img src="https://img.shields.io/badge/version-1.2.0-blueviolet?style=for-the-badge&logo=whatsapp&logoColor=white"/>
   <img src="https://img.shields.io/badge/Node.js-20.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white"/>
   <img src="https://img.shields.io/badge/Commands-255+-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Made%20by-Chris%20Gaaju-FF6B6B?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Made%20by-Syntax_king-FF6B6B?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge"/>
 
   <br><br>
@@ -20,15 +20,15 @@
   ## 🔑 SESSION & SETUP
 
   👉 Get your Session ID here:  
-  <a href="https://gaaju-ultra-pair-ljtv.onrender.com/?utm_source=chatgpt.com">
+  <a href="https://example.com/session-generator/?utm_source=chatgpt.com">
     <img src="https://img.shields.io/badge/SESSION-GENERATOR-blue?style=for-the-badge&logo=render&logoColor=white"/>
   </a>
 
   <br><br>
 
-  ## 🚀 DEPLOY GAAJU ULTRA
+  ## 🚀 DEPLOY SYNTAX-KING-MD
 
-  <a href="https://dashboard.heroku.com/new?template=https://github.com/Xchristech2/GAAJU-MD-ULTRA">
+  <a href="https://dashboard.heroku.com/new?template=https://github.com/yourusername/SYNTAX-KING-MD">
     <img src="https://img.shields.io/badge/DEPLOY%20TO-HEROKU-6762A6?style=for-the-badge&logo=heroku&logoColor=white"/>
   </a>
 
@@ -66,29 +66,29 @@
 
   ## 🔗 IMPORTANT LINKS
 
-  📡 Telegram Channel:  
-  <a href="https://t.me/chrisgaajutechs?utm_source=chatgpt.com">
+  📡 Support Channel:  
+  <a href="https://example.com/support">
     <img src="https://img.shields.io/badge/TELEGRAM-CHANNEL-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white"/>
   </a>
 
   <br><br>
 
   📢 WhatsApp Channel:  
-  <a href="https://whatsapp.com/channel/0029VbBvGgyFsn0alyIDjw0z">
+  <a href="https://example.com/channel">
     <img src="https://img.shields.io/badge/WHATSAPP-CHANNEL-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
   </a>
 
   <br><br>
 
   💬 WhatsApp Group:  
-  <a href="https://chat.whatsapp.com/Hz6S44KXVwO4bO88zDoJ9q?mode=gi_t&utm_source=chatgpt.com">
+  <a href="https://example.com/group">
     <img src="https://img.shields.io/badge/WHATSAPP-GROUP-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
   </a>
 
   <br><br>
 
   🤖 WhatsApp Chat:  
-  <a href="https://chat.whatsapp.com/E4SnKL0H0gxL7aGvqAwB9L?mode=gi_t?utm_source=chatgpt.com">
+  <a href="https://example.com/chat">
     <img src="https://img.shields.io/badge/WHATSAPP-CHAT-128C7E?style=for-the-badge&logo=whatsapp&logoColor=white"/>
   </a>
 

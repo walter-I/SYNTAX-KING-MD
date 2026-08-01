@@ -1,5 +1,5 @@
 /**
-   * GAAJU-MD — Settings / Config Store
+   * SYNTAX-KING-MD — Settings / Config Store
    * Lightweight JSON-file persistence. No native modules needed.
    * Stores all bot settings in data/config.json
    */

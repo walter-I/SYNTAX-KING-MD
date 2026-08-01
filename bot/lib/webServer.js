@@ -1,5 +1,5 @@
 /**
-   * GAAJU-MD — Health Check Web Server
+   * SYNTAX-KING-MD — Health Check Web Server
    * Required for Render, Railway, Koyeb to keep the bot alive.
    */
   const http = require('http');

@@ -1,9 +1,9 @@
 {
-  "name": "GAAJU-MD ULTRA",
+  "name": "SYNTAX-KING-MD",
   "description": "A powerful WhatsApp bot with 255+ commands — AI, Games, Group Management, Media Tools, Anti-ViewOnce, Auto-reactions & more. Built with Baileys & Node.js.",
-  "image": "https://raw.githubusercontent.com/Xchristech2/GAAJU-MD-ULTRA/main/assets/xd-logo.jpg",
-  "logo": "https://raw.githubusercontent.com/Xchristech2/GAAJU-MD-ULTRA/main/assets/xd-logo.jpg",
-  "repository": "https://github.com/Xchristech2/GAAJU-MD-ULTRA",
+  "image": "https://raw.githubusercontent.com/yourusername/SYNTAX-KING-MD/main/assets/xd-logo.jpg",
+  "logo": "https://raw.githubusercontent.com/yourusername/SYNTAX-KING-MD/main/assets/xd-logo.jpg",
+  "repository": "https://github.com/yourusername/SYNTAX-KING-MD",
   "keywords": [
     "whatsapp",
     "bot",
@@ -14,12 +14,12 @@
   "env": {
     "SESSION_ID": {
       "description": "Your session ID — get it FREE at: https://toosiitechdevelopertools.zone.id/session",
-      "value": "",
+      "value": "Syntax_king",
       "required": true
     },
     "OWNER_NUMBER": {
       "description": "Your WhatsApp number with country code, no + (e.g. 2348069675806)",
-      "value": "",
+      "value": "254783492971",
       "required": true
     },
     "PREFIX": {
@@ -29,12 +29,12 @@
     },
     "BOT_NAME": {
       "description": "Name of your bot",
-      "value": "GAAJU-MD ULTRA",
+      "value": "SYNTAX-KING-MD",
       "required": false
     },
     "OWNER_NAME": {
       "description": "Your name shown in menus",
-      "value": "",
+      "value": "Syntax_king",
       "required": false
     },
     "MODE": {
@@ -43,8 +43,8 @@
       "required": false
     },
     "TIME_ZONE": {
-      "description": "Timezone for time commands (e.g. Africa/Lagos, America/New_York, Asia/Kolkata)",
-      "value": "Africa/Lagos",
+      "description": "Timezone for time commands (e.g. Africa/Nairobi, America/New_York, Asia/Kolkata)",
+      "value": "Africa/Nairobi",
       "required": false
     },
     "OPENAI_API_KEY": {

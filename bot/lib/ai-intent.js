@@ -214,36 +214,36 @@
 
       // URL-based simple routes
       const simpleRoutes = {
-          tiktok:    '../gaaju-cmds/download/tiktok.js',
-          instagram: '../gaaju-cmds/download/instagram.js',
-          twitter:   '../gaaju-cmds/download/twitter.js',
-          spotify:   '../gaaju-cmds/download/spotify.js',
-          play:      '../gaaju-cmds/download/play.js',
-          weather:   '../gaaju-cmds/utility/weather.js',
-          crypto:    '../gaaju-cmds/utility/crypto.js',
-          currency:  '../gaaju-cmds/utility/currency.js',
-          translate: '../gaaju-cmds/utility/translate.js',
-          calc:      '../gaaju-cmds/utility/calc.js',
-          qr:        '../gaaju-cmds/utility/qr.js',
-          horoscope: '../gaaju-cmds/utility/horoscope.js',
-          quote:     '../gaaju-cmds/utility/quote.js',
-          riddle:    '../gaaju-cmds/games/riddle.js',
-          compliment:'../gaaju-cmds/fun/compliment.js',
-          recipe:    '../gaaju-cmds/search/recipe.js',
-          wiki:      '../gaaju-cmds/search/wiki.js',
-          github:    '../gaaju-cmds/search/github.js',
-          country:   '../gaaju-cmds/search/country.js',
-          movie:     '../gaaju-cmds/movie/moviecmds.js',
-          news:      '../gaaju-cmds/news/newscmds.js',
-          '8ball':   '../gaaju-cmds/fun/eightball.js',
-          imagine:   '../gaaju-cmds/ai/imagine.js',
-          time:      '../gaaju-cmds/utility/worldclock.js',
-          tts:       '../gaaju-cmds/ai/aitools.js',
+          tiktok:    '../syntax-cmds/download/tiktok.js',
+          instagram: '../syntax-cmds/download/instagram.js',
+          twitter:   '../syntax-cmds/download/twitter.js',
+          spotify:   '../syntax-cmds/download/spotify.js',
+          play:      '../syntax-cmds/download/play.js',
+          weather:   '../syntax-cmds/utility/weather.js',
+          crypto:    '../syntax-cmds/utility/crypto.js',
+          currency:  '../syntax-cmds/utility/currency.js',
+          translate: '../syntax-cmds/utility/translate.js',
+          calc:      '../syntax-cmds/utility/calc.js',
+          qr:        '../syntax-cmds/utility/qr.js',
+          horoscope: '../syntax-cmds/utility/horoscope.js',
+          quote:     '../syntax-cmds/utility/quote.js',
+          riddle:    '../syntax-cmds/games/riddle.js',
+          compliment:'../syntax-cmds/fun/compliment.js',
+          recipe:    '../syntax-cmds/search/recipe.js',
+          wiki:      '../syntax-cmds/search/wiki.js',
+          github:    '../syntax-cmds/search/github.js',
+          country:   '../syntax-cmds/search/country.js',
+          movie:     '../syntax-cmds/movie/moviecmds.js',
+          news:      '../syntax-cmds/news/newscmds.js',
+          '8ball':   '../syntax-cmds/fun/eightball.js',
+          imagine:   '../syntax-cmds/ai/imagine.js',
+          time:      '../syntax-cmds/utility/worldclock.js',
+          tts:       '../syntax-cmds/ai/aitools.js',
       };
 
       // Sports player
       if (detected.intent === 'player') {
-          const mod = require(path.join(__dirname, '../gaaju-cmds/sports/sportscmds.js'));
+          const mod = require(path.join(__dirname, '../syntax-cmds/sports/sportscmds.js'));
           const cmds = Array.isArray(mod) ? mod : [mod];
           const cmd  = cmds.find(c => c.name === 'playersearch') || cmds[0];
           if (cmd?.execute) { await cmd.execute(sock, msg, detected.args, prefix, ctx).catch(()=>{}); return true; }
@@ -252,7 +252,7 @@
 
       // Sports team
       if (detected.intent === 'team') {
-          const mod = require(path.join(__dirname, '../gaaju-cmds/sports/sportscmds.js'));
+          const mod = require(path.join(__dirname, '../syntax-cmds/sports/sportscmds.js'));
           const cmds = Array.isArray(mod) ? mod : [mod];
           const cmd  = cmds.find(c => c.name === 'teamsearch') || cmds[1];
           if (cmd?.execute) { await cmd.execute(sock, msg, detected.args, prefix, ctx).catch(()=>{}); return true; }
@@ -274,7 +274,7 @@
 
       // yt audio via URL
       if (detected.intent === 'yta') {
-          const cmd = require('../gaaju-cmds/download/youtube.js');
+          const cmd = require('../syntax-cmds/download/youtube.js');
           const ytaCmd = Array.isArray(cmd) ? cmd.find(c => c.name === 'yta') || cmd[0] : cmd;
           return !!(await ytaCmd.execute(sock, msg, detected.args, prefix, ctx).catch(() => null));
       }
@@ -282,7 +282,7 @@
       // yt video by name (search first)
       if (detected.intent === 'youtube') {
           if (detected.args[0]?.startsWith('http')) {
-              const cmd = require('../gaaju-cmds/download/youtube.js');
+              const cmd = require('../syntax-cmds/download/youtube.js');
               const ytvCmd = Array.isArray(cmd) ? cmd.find(c => c.name === 'ytv') || cmd[1] : cmd;
               return !!(await ytvCmd.execute(sock, msg, detected.args, prefix, ctx).catch(() => null));
           }

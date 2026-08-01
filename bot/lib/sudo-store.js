@@ -1,5 +1,5 @@
 /**
-     * GAAJU-MD — Sudo / Owner Store
+     * SYNTAX-KING-MD — Sudo / Owner Store
      * Persists sudo list and LID mappings in data/sudo.json
      */
     const fs   = require('fs');

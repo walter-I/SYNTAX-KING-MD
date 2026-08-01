@@ -709,33 +709,33 @@ async function autoScanGroupsForSudo(sock) {
 // Import automation handlers
 const {
   handleAutoReact
-} = require("./gaaju-cmds/automation/autoreactstatus.js");
+} = require("./syntax-cmds/automation/autoreactstatus.js");
 const {
   handleChannelReact,
   discoverNewsletters,
   channelReactManager
-} = require("./gaaju-cmds/channel/channelreact.js");
+} = require("./syntax-cmds/channel/channelreact.js");
 const {
   handleReactOwner
-} = require("./gaaju-cmds/automation/reactowner.js");
+} = require("./syntax-cmds/automation/reactowner.js");
 const {
   handleReactDev
-} = require("./gaaju-cmds/automation/reactdev.js");
+} = require("./syntax-cmds/automation/reactdev.js");
 const {
   handleAutoView
-} = require("./gaaju-cmds/automation/autoviewstatus.js");
+} = require("./syntax-cmds/automation/autoviewstatus.js");
 const {
   handleAutoDownloadStatus
-} = require("./gaaju-cmds/automation/autodownloadstatus.js");
+} = require("./syntax-cmds/automation/autodownloadstatus.js");
 const {
   initializeAutoJoin
-} = require("./gaaju-cmds/group/add.js");
-const antidemote = require("./gaaju-cmds/group/antidemote.js");
+} = require("./syntax-cmds/group/add.js");
+const antidemote = require("./syntax-cmds/group/antidemote.js");
 const {
   isBugMessage: antibugCheck,
   isEnabled: antibugEnabled,
   getAction: antibugGetAction
-} = require("./gaaju-cmds/group/antibug.js");
+} = require("./syntax-cmds/group/antibug.js");
 const {
   checkMessageForLinks: antilinkCheck,
   isEnabled: antilinkEnabled,
@@ -743,7 +743,7 @@ const {
   getGroupConfig: antilinkGetConfig,
   isLinkExempt: antilinkIsExempt,
   isExcludedType: antilinkIsExcludedType
-} = require("./gaaju-cmds/group/antilink.js");
+} = require("./syntax-cmds/group/antilink.js");
 const {
   checkMessageForBadWord,
   isGroupEnabled: isBadWordEnabled,
@@ -753,8 +753,8 @@ const {
   isEnabled: antispamEnabled,
   getAction: antispamGetAction,
   checkSpam: antispamCheck
-} = require("./gaaju-cmds/group/antispam.js");
-const banCommand = require("./gaaju-cmds/group/ban.js");
+} = require("./syntax-cmds/group/antispam.js");
+const banCommand = require("./syntax-cmds/group/ban.js");
 const {
   setupWebServer,
   updateWebStatus
@@ -763,47 +763,47 @@ const {
 // Pre-imported group event modules (avoids dynamic import disk I/O in hot event handlers)
 const {
   handleGroupParticipantUpdate: antidemoteHandler
-} = require("./gaaju-cmds/group/antidemote.js");
+} = require("./syntax-cmds/group/antidemote.js");
 const {
   handleGroupUpdate: antipromoteHandler
-} = require("./gaaju-cmds/group/antipromote.js");
+} = require("./syntax-cmds/group/antipromote.js");
 const {
   isWelcomeEnabled,
   getWelcomeMessage,
   sendWelcomeMessage
-} = require("./gaaju-cmds/group/welcome.js");
+} = require("./syntax-cmds/group/welcome.js");
 const {
   isGoodbyeEnabled,
   getGoodbyeMessage,
   sendGoodbyeMessage
-} = require("./gaaju-cmds/group/goodbye.js");
+} = require("./syntax-cmds/group/goodbye.js");
 const {
   handleStatusMention: statusMentionHandler
-} = require("./gaaju-cmds/group/antistatusmention.js");
+} = require("./syntax-cmds/group/antistatusmention.js");
 const {
   setupAntiGroupStatusListener
-} = require("./gaaju-cmds/group/antigroupstatus.js");
+} = require("./syntax-cmds/group/antigroupstatus.js");
 const {
   setupAntiTagListener
-} = require("./gaaju-cmds/group/antitag.js");
+} = require("./syntax-cmds/group/antitag.js");
 const {
   setupAntiGroupMentionListener
-} = require("./gaaju-cmds/group/antigroupmention.js");
+} = require("./syntax-cmds/group/antigroupmention.js");
 const {
   setupWordFilterListener
-} = require("./gaaju-cmds/group/wordfilter.js");
+} = require("./syntax-cmds/group/wordfilter.js");
 const {
   setupAutoReplyListener
-} = require("./gaaju-cmds/group/autoreply.js");
+} = require("./syntax-cmds/group/autoreply.js");
 const {
   setupSlowModeListener
-} = require("./gaaju-cmds/group/slowmode.js");
+} = require("./syntax-cmds/group/slowmode.js");
 const {
   isWhitelisted
-} = require("./gaaju-cmds/owner/whitelist.js");
+} = require("./syntax-cmds/owner/whitelist.js");
 const {
   isBlacklisted
-} = require("./gaaju-cmds/owner/blacklist.js");
+} = require("./syntax-cmds/owner/blacklist.js");
 
 // Import antidelete system (listeners registered in index.js, always active)
 const {
@@ -811,7 +811,7 @@ const {
   antideleteStoreMessage,
   antideleteHandleUpdate,
   updateAntideleteSock
-} = require("./gaaju-cmds/owner/antidelete.js");
+} = require("./syntax-cmds/owner/antidelete.js");
 
 // Import status antidelete system (always on, handles status messages exclusively)
 const {
@@ -819,7 +819,7 @@ const {
   statusAntideleteStoreMessage,
   statusAntideleteHandleUpdate,
   updateStatusAntideleteSock
-} = require("./gaaju-cmds/owner/antideletestatus.js");
+} = require("./syntax-cmds/owner/antideletestatus.js");
 const {
   initStatusReplyListener
 } = require("./lib/statusReplyListener.js");
@@ -828,7 +828,7 @@ const {
 const {
   isChatbotActiveForChat,
   handleChatbotMessage
-} = require("./gaaju-cmds/ai/chatbot.js");
+} = require("./syntax-cmds/ai/chatbot.js");
 
 // ====== ENVIRONMENT SETUP ======
 dotenv.config({
@@ -1044,7 +1044,7 @@ const STICKER_DELAY = 400;
 // const SEND_WELCOME_MESSAGE = true;
 // const GROUP_LINK = 'https://chat.whatsapp.com/J2H0ksHUHaLDhYkjxVzvvl';
 // const GROUP_INVITE_CODE = GROUP_LINK.split('/').pop();
-// const GROUP_NAME = 'GAAJU-MD Community';
+// const GROUP_NAME = 'SYNTAX-KING-MD Community';
 // const AUTO_JOIN_LOG_FILE = './auto_join_log.json';
 
 // ====== SILENCE BAILEYS ======
@@ -1583,7 +1583,7 @@ const DiskManager = {
     const voMedia = 0;
     const adMedia = this.getDirSize("./data/antidelete/media");
     const statusMedia = this.getDirSize("./data/antidelete/status/media");
-    const tempFiles = this.getDirSize("./temp") + this.getDirSize("./gaaju-cmds/temp");
+    const tempFiles = this.getDirSize("./temp") + this.getDirSize("./syntax-cmds/temp");
     const backupFiles = this.getDirSize("./session_backup");
     const statusLogs = (() => {
       try {
@@ -1702,7 +1702,7 @@ const DiskManager = {
   },
   async cleanTempFilesAsync(aggressive = false) {
     let removed = 0;
-    const tempDirs = ["./temp", "./temp/ig", "./temp/snapchat", "./temp/compressed", "./temp/apk", "./gaaju-cmds/temp", "./viewonce_stealth", "./viewonce_downloads", "./temp_stickers", "./temp_url_uploads", "./collected_stickers", "./sticker_packs"];
+    const tempDirs = ["./temp", "./temp/ig", "./temp/snapchat", "./temp/compressed", "./temp/apk", "./syntax-cmds/temp", "./viewonce_stealth", "./viewonce_downloads", "./temp_stickers", "./temp_url_uploads", "./collected_stickers", "./sticker_packs"];
     const now = Date.now();
     const maxAge = aggressive ? 120000 : 900000;
     for (const dir of tempDirs) {
@@ -2534,8 +2534,8 @@ const memberDetector = new NewMemberDetector();
 
 //         try {
 //             await sock.sendMessage(userJid, {
-//                 text: `🎉 *WELCOME TO GAAJU-MD!*\n\n` +
-//                       `Thank you for connecting with GAAJU-MD! 🤖\n\n` +
+//                 text: `🎉 *WELCOME TO SYNTAX-KING-MD!*\n\n` +
+//                       `Thank you for connecting with SYNTAX-KING-MD! 🤖\n\n` +
 //                       `✨ *Features Available:*\n` +
 //                       `• Multiple command categories\n` +
 //                       `• Group management tools\n` +
@@ -4079,14 +4079,35 @@ function checkSessionValidity() {
 // ====== SESSION ID PARSER ======
 function parseBotSession(sessionString) {
   try {
+    if (!sessionString || typeof sessionString !== "string") {
+      return null;
+    }
+
     let cleanedSession = sessionString.trim();
+
+    if (!cleanedSession) {
+      return null;
+    }
+
+    const placeholderPatterns = [
+      /^your[_-]?session[_-]?id(?:_here)?$/i,
+      /^session[_-]?id$/i,
+      /^example$/i,
+      /^placeholder$/i,
+      /your_session_id_here/i
+    ];
+
+    if (placeholderPatterns.some((pattern) => pattern.test(cleanedSession))) {
+      UltraCleanLogger.warning("⚠️ Placeholder SESSION_ID detected, skipping session parse.");
+      return null;
+    }
     cleanedSession = cleanedSession.replace(/^["']|["']$/g, "");
-    if (cleanedSession.startsWith("GAAJU-MD:")) {
-      UltraCleanLogger.info("🔍 Detected GAAJU-MD: prefix");
+    if (cleanedSession.startsWith("SYNTAX-KING-MD:")) {
+      UltraCleanLogger.info("🔍 Detected SYNTAX-KING-MD: prefix");
       let base64Part = cleanedSession.substring(9).trim();
       base64Part = base64Part.replace(/^~+/, "");
       if (!base64Part) {
-        throw new Error("No data found after GAAJU-MD:");
+        throw new Error("No data found after SYNTAX-KING-MD:");
       }
       try {
         const decodedString = Buffer.from(base64Part, "base64").toString("utf8");
@@ -4115,11 +4136,11 @@ function setupHerokuSession() {
     if (herokuSessionId && herokuSessionId.trim() !== "") {
       UltraCleanLogger.success("🚀 Detected Heroku deployment with SESSION_ID");
 
-      // Parse GAAJU-MD session format
-      if (herokuSessionId.startsWith("GAAJU-MD:")) {
-        UltraCleanLogger.info("🔐 Processing GAAJU-MD session format...");
+      // Parse SYNTAX-KING-MD session format
+      if (herokuSessionId.startsWith("SYNTAX-KING-MD:")) {
+        UltraCleanLogger.info("🔐 Processing SYNTAX-KING-MD session format...");
         try {
-          // Remove GAAJU-MD: prefix and decode
+          // Remove SYNTAX-KING-MD: prefix and decode
           const base64Part = herokuSessionId.substring(9).trim().replace(/^~+/, "");
           const decodedSession = Buffer.from(base64Part, "base64").toString("utf8");
           const sessionData = JSON.parse(decodedSession);
@@ -4271,7 +4292,7 @@ class LoginManager {
     });
   }
   async selectMode() {
-    console.log(chalk.yellow("\n🤖 GAAJU-MD ULTRA v" + VERSION + " - LOGIN SYSTEM"));
+    console.log(chalk.yellow("\n🤖 SYNTAX-KING-MD v" + VERSION + " - LOGIN SYSTEM"));
     console.log(chalk.blue("1) Pairing Code Login (Recommended)"));
     console.log(chalk.blue("2) Clean Session & Start Fresh"));
     console.log(chalk.magenta("3) Use Session ID from Environment"));
@@ -4294,7 +4315,7 @@ class LoginManager {
       console.log(chalk.yellow("ℹ️ No SESSION_ID found in environment"));
       const input = await this.ask("\nWould you like to:\n1) Paste Session ID now\n2) Go back to main menu\nChoice (1-2): ");
       if (input.trim() === "1") {
-        sessionId = await this.ask("Paste your Session ID (GAAJU-MD:... or base64): ");
+        sessionId = await this.ask("Paste your Session ID (SYNTAX-KING-MD:... or base64): ");
         if (!sessionId || sessionId.trim() === "") {
           console.log(chalk.red("❌ No Session ID provided"));
           return await this.selectMode();
@@ -4559,7 +4580,7 @@ async function startBot(loginMode = "auto", loginData = null) {
       UltraCleanLogger.info("⏳ Loading commands...");
       commands.clear();
       commandCategories.clear();
-      commandLoadPromise = loadCommandsFromFolder("./gaaju-cmds");
+      commandLoadPromise = loadCommandsFromFolder("./syntax-cmds");
       initialCommandsLoaded = true;
     } else {
       UltraCleanLogger.info("📦 Commands already loaded, skipping...");
@@ -5185,7 +5206,7 @@ async function startBot(loginMode = "auto", loginData = null) {
 ┃ ✦ Status    : ✅ CONNECTED
 ┃
 ┃ 📢 Support Group
-┃ https://chat.whatsapp.com/Hz6S44KXVwO4bO88zDoJ9q
+┃ https://chat.whatsapp.com/LwvhCXPsNJp3osuBsi5ctm?s=cl&p=a&mlu=4
 ┃
 ╰━━━━━━━━━━━━━━━〔 SYSTEM ONLINE 〕⬣`;
             const sendPromise = sock.sendMessage(targetJid, {
@@ -6582,7 +6603,7 @@ async function handleSuccessfulConnection(sock, loginMode, loginData) {
 ┃ ✦ Status   : ${isAutoReconnect ? "RECONNECTED" : "CONNECTED"} ✅
 ┃
 ┃ 📢 Support Group
-┃ https://chat.whatsapp.com/Hz6S44KXVwO4bO88zDoJ9q
+┃ https://chat.whatsapp.com/LwvhCXPsNJp3osuBsi5ctm?s=cl&p=a&mlu=4
 ┃
 ╰━━━━━━━━━━━━━━━〔 SYSTEM ONLINE 〕⬣`));
 
@@ -7701,11 +7722,11 @@ async function handleIncomingMessage(sock, msg) {
             const aiDisplay = getDisplayNumber(senderJid);
             const aiLocTag = isGroup ? `[${chatId.split("@")[0].substring(0, 10)}]` : "[DM]";
             const aiPreview = textMsg.length > 50 ? textMsg.substring(0, 50) + "…" : textMsg;
-            UltraCleanLogger.info(`🤖 Gaaju AI: ${aiDisplay} ${aiLocTag} → "${aiPreview}"`);
+            UltraCleanLogger.info(`🤖 Syntax AI: ${aiDisplay} ${aiLocTag} → "${aiPreview}"`);
             return;
           }
         } catch (aiErr) {
-          UltraCleanLogger.error(`🤖 Gaaju AI error: ${aiErr.message}`);
+          UltraCleanLogger.error(`🤖 Syntax AI error: ${aiErr.message}`);
         }
       }
     }
@@ -8439,7 +8460,7 @@ async function handleDefaultCommands(commandName, sock, msg, args, currentPrefix
 //         UltraCleanLogger.info(`Rate limit protection: ${RATE_LIMIT_ENABLED ? '✅' : '❌'}`);
 //         UltraCleanLogger.info(`Console filtering: ✅ ULTRA CLEAN ACTIVE`);
 //         UltraCleanLogger.info(`⚡ Response speed: OPTIMIZED (Reduced delays by 50-70%)`);
-//         UltraCleanLogger.info(`🔐 Session ID support: ✅ ENABLED (GAAJU-MD: format)`);
+//         UltraCleanLogger.info(`🔐 Session ID support: ✅ ENABLED (SYNTAX-KING-MD: format)`);
 //         UltraCleanLogger.info(`🎯 Member Detection: ✅ ENABLED (New members in groups)`);
 //         UltraCleanLogger.info(`🔐 Anti-ViewOnce: ✅ ENABLED (Private/Auto modes)`);
 //         UltraCleanLogger.info(`👥 Welcome System: ✅ ENABLED (Auto-welcome new members)`);
