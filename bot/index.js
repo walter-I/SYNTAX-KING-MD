@@ -4734,19 +4734,34 @@ async function startBot(loginMode = "auto", loginData = null) {
       // ─── LID JID resolution ──────────────────────────────────────────
       // Baileys crashes when sending to @lid JIDs — resolve to @s.whatsapp.net
       if (jid && jid.endsWith("@lid")) {
-        try {
-          const _lidResolved = resolvePhoneFromLid(jid);
-          if (_lidResolved) {
-            jid = `${_lidResolved}@s.whatsapp.net`;
-          } else {
-            // Fallback: owner LID → use owner's clean JID (covers self-DMs)
-            const _ownerFallback = (typeof OWNER_CLEAN_NUMBER !== "undefined" && OWNER_CLEAN_NUMBER)
-              || (process.env.OWNER_NUMBER || "").replace(/[^0-9]/g, "");
-            if (_ownerFallback) {
-              jid = `${_ownerFallback}@s.whatsapp.net`;
+        const _targetLid = jid.split("@")[0].split(":")[0];
+        let _lidResolved = resolvePhoneFromLid(jid);
+        if (!_lidResolved) {
+          try {
+            const _mappedJid = await currentSock?.signalRepository?.lidMapping?.getPNForLID?.(jid);
+            const _mappedNumber = String(_mappedJid || "").split("@")[0].split(":")[0].replace(/[^0-9]/g, "");
+            if (_mappedNumber.length >= 7 && _mappedNumber.length <= 15 && _mappedNumber !== _targetLid) {
+              _lidResolved = _mappedNumber;
+              cacheLidPhone(_targetLid, _mappedNumber);
             }
+          } catch (error) {
+            UltraCleanLogger.warning(`⚠️ Could not resolve LID recipient: ${error.message}`);
           }
-        } catch {}
+        }
+        if (_lidResolved) {
+          jid = `${_lidResolved}@s.whatsapp.net`;
+        } else {
+          const _ownerLid = OWNER_LID ? OWNER_LID.split("@")[0].split(":")[0] : "";
+          const _ownerFallback = (typeof OWNER_CLEAN_NUMBER !== "undefined" && OWNER_CLEAN_NUMBER)
+            || (process.env.OWNER_NUMBER || "").replace(/[^0-9]/g, "");
+          if (_ownerFallback && _ownerLid && _targetLid === _ownerLid) {
+            jid = `${_ownerFallback}@s.whatsapp.net`;
+          } else {
+            const error = new Error("Cannot resolve LID recipient; refusing to redirect the message to the owner");
+            UltraCleanLogger.warning(`⚠️ ${error.message}`);
+            throw error;
+          }
+        }
       }
       // ─── Font transformation ────────────────────────────────────────
       const _activeFont = globalThis._fontConfig && globalThis._fontConfig.font || "default";
@@ -6856,7 +6871,7 @@ function loadAntiViewOnceConfig() {
     if (fs.existsSync(localFile)) {
       const parsed = JSON.parse(fs.readFileSync(localFile, "utf8"));
       // Accept both legacy { mode } and new { gc, pm } formats
-      if (parsed && typeof parsed === "object" && (parsed.mode || parsed.gc || parsed.pm)) {
+      if (parsed && typeof parsed === "object" && (parsed.mode || parsed.gc || parsed.pm || "enabled" in parsed)) {
         // Migrate: older configs lack enabled field — default OFF (require explicit .antiviewonce on)
         if (!("enabled" in parsed)) {
           parsed.enabled = false;
@@ -7086,17 +7101,14 @@ async function handleViewOnceDetection(sock, msg) {
     const chatId = msg.key.remoteJid;
     const isGroup = chatId?.endsWith("@g.us");
 
-    // Determine effective enabled/mode from gc/pm config
+    // Determine whether detection is enabled for this chat.
     let enabled;
-    let deliveryMode;
     if (config.gc && config.pm) {
       const scope = isGroup ? config.gc : config.pm;
       enabled = scope.enabled;
-      deliveryMode = scope.mode || "private";
     } else {
       // Legacy flat config
       enabled = config.enabled !== false && config.mode !== "off";
-      deliveryMode = config.mode === "public" ? "chat" : "private";
     }
     if (!enabled) {
       return;
@@ -7191,67 +7203,22 @@ async function handleViewOnceDetection(sock, msg) {
       mediaPayload.fileName = filename;
     }
 
-    // Resolve owner JID — config.ownerJid SKIPPED (stale disk value causes wrong target)
-    // Priority: process.env → creds.json me.id → OWNER_CLEAN_JID (non-LID only)
-    let ownerJid = "";
-    // 1. process.env.OWNER_NUMBER (Pterodactyl env var or .env)
-    if (!ownerJid) {
-      const _envNum = (process.env.OWNER_NUMBER || "").replace(/[^0-9]/g, "");
-      if (_envNum && _envNum.length >= 7 && _envNum.length <= 13) {
-        ownerJid = `${_envNum}@s.whatsapp.net`;
+    let senderTarget = sender;
+    if (senderTarget.endsWith("@lid")) {
+      const senderNumber = resolvePhoneFromLid(senderTarget)
+        || (isGroup ? await resolveSenderFromGroup(senderTarget, chatId, sock) : null);
+      if (!senderNumber) {
+        UltraCleanLogger.warning("Anti-ViewOnce: cannot resolve sender LID; media was not forwarded");
+        return;
       }
+      senderTarget = `${senderNumber}@s.whatsapp.net`;
     }
-    // 2. creds.json me.id — real phone JID stored at pairing time
-    if (!ownerJid) {
-      try {
-        const _cr = JSON.parse(require("fs").readFileSync(join(__dirname, "session/creds.json"), "utf8"));
-        const _mid = _cr?.me?.id || "";
-        if (_mid && !_mid.includes("@lid")) {
-          const _cn = _mid.split("@")[0].split(":")[0].replace(/[^0-9]/g, "");
-          if (_cn.length >= 7 && _cn.length <= 13) {
-            ownerJid = `${_cn}@s.whatsapp.net`;
-          }
-        }
-      } catch (_) {}
-    }
-    // 3. OWNER_CLEAN_JID — only genuine phone-number JIDs (reject LID and >13 digits)
-    if (!ownerJid) {
-      const _autoJid = OWNER_CLEAN_JID || "";
-      const _autoNum = _autoJid.split("@")[0].split(":")[0].replace(/[^0-9]/g, "");
-      if (_autoNum && _autoNum.length >= 7 && _autoNum.length <= 13 && !_autoJid.includes("@lid")) {
-        ownerJid = `${_autoNum}@s.whatsapp.net`;
-      }
-    }
-
-    // Determine target(s)
-    // DMs (not groups): ALWAYS send to owner's saved messages for privacy
-    // Groups: respect the chosen deliveryMode (private / chat / both)
-    const targets = [];
-    if (!isGroup) {
-      // View-once from a DM — always forward to owner regardless of mode
-      if (ownerJid) {
-        targets.push(jidNormalizedUser(ownerJid));
-      }
-    } else {
-      if (deliveryMode === "private" || deliveryMode === "both") {
-        if (ownerJid) {
-          targets.push(jidNormalizedUser(ownerJid));
-        }
-      }
-      if ((deliveryMode === "chat" || deliveryMode === "both") && chatId !== ownerJid) {
-        targets.push(chatId);
-      }
-      if (targets.length === 0 && ownerJid) {
-        targets.push(jidNormalizedUser(ownerJid));
-      }
-    }
-    for (const target of targets) {
-      try {
-        await sock.sendMessage(target, mediaPayload);
-        UltraCleanLogger.antiviewonce(`🔐 View-Once sent to ${target}`);
-      } catch (sendErr) {
-        UltraCleanLogger.warning(`Anti-ViewOnce send failed to ${target}: ${sendErr.message}`);
-      }
+    try {
+      const target = jidNormalizedUser(senderTarget);
+      await sock.sendMessage(target, mediaPayload);
+      UltraCleanLogger.antiviewonce(`🔐 View-Once sent privately to sender ${target}`);
+    } catch (sendErr) {
+      UltraCleanLogger.warning(`Anti-ViewOnce send to sender failed: ${sendErr.message}`);
     }
     try {
       const mimetype = type === "image" ? "image/jpeg" : type === "video" ? "video/mp4" : "audio/mpeg";
@@ -7390,18 +7357,26 @@ async function handleIncomingMessage(sock, msg) {
     // that reads msg.key.remoteJid directly gets the resolved JID.
     let chatId = msg.key.remoteJid;
     if (chatId && chatId.endsWith("@lid")) {
-      try {
-        const _lidPhone = resolvePhoneFromLid(chatId);
-        if (_lidPhone) {
-          chatId = `${_lidPhone}@s.whatsapp.net`;
-        } else {
-          const _ownerNum = (typeof OWNER_CLEAN_NUMBER !== "undefined" && OWNER_CLEAN_NUMBER)
-            || (process.env.OWNER_NUMBER || "").replace(/[^0-9]/g, "");
-          if (msg.key.fromMe && _ownerNum) {
-            chatId = `${_ownerNum}@s.whatsapp.net`;
+      let _lidPhone = resolvePhoneFromLid(chatId);
+      if (!_lidPhone) {
+        const _alternateJid = msg.key.remoteJidAlt || msg.key.participantAlt || msg.key.participantPn || "";
+        if (_alternateJid.endsWith("@s.whatsapp.net")) {
+          const _alternateNumber = _alternateJid.split("@")[0].split(":")[0].replace(/[^0-9]/g, "");
+          if (_alternateNumber.length >= 7 && _alternateNumber.length <= 15) {
+            _lidPhone = _alternateNumber;
+            cacheLidPhone(chatId.split("@")[0].split(":")[0], _alternateNumber);
           }
         }
-      } catch {}
+      }
+      if (_lidPhone) {
+        chatId = `${_lidPhone}@s.whatsapp.net`;
+      } else {
+        const _ownerNum = (typeof OWNER_CLEAN_NUMBER !== "undefined" && OWNER_CLEAN_NUMBER)
+          || (process.env.OWNER_NUMBER || "").replace(/[^0-9]/g, "");
+        if (msg.key.fromMe && _ownerNum) {
+          chatId = `${_ownerNum}@s.whatsapp.net`;
+        }
+      }
       // Patch the message object so all downstream command code sees the resolved JID
       if (!chatId.endsWith("@lid")) {
         msg.key.remoteJid = chatId;

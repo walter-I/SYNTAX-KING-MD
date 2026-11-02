@@ -62,3 +62,5 @@ bot/data/welcome_data.json
 bot/data/viewonce_messages/
 bot/data/antiviewonce/
 bot/.botname.json
+
+.env

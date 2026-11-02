@@ -1,7 +1,6 @@
 const yts = require("yt-search");
-const { dlBuffer } = require("../../lib/keithapi");
-const axios = require("axios");
 const { getBotName } = require("../../lib/botname");
+const youtubeCommands = require("./youtube");
 
 function trunc(_0x51d347, _0x3ebbc4 = 38) {
   if (_0x51d347 && _0x51d347.length > _0x3ebbc4) {
@@ -9,16 +8,6 @@ function trunc(_0x51d347, _0x3ebbc4 = 38) {
   } else {
     return _0x51d347 || "";
   }
-}
-
-function fmtSize(_0x951564) {
-  if (!_0x951564) {
-    return "? MB";
-  }
-  if (_0x951564 >= 1048576) {
-    return (_0x951564 / 1024 / 1024).toFixed(2) + " MB";
-  }
-  return (_0x951564 / 1024).toFixed(1) + " KB";
 }
 
 module.exports = {
@@ -59,44 +48,11 @@ module.exports = {
         url = search.videos[0].url;
       }
       
-      const { data } = await axios.get(
-        "https://eliteprotech-apis.zone.id/convert",
-        {
-          params: {
-            url,
-            format: "mp3"
-          }
-        }
-      );
-      
-      if (!data.success || !data.downloadURL) {
-        throw new Error("Failed to convert audio.");
+      const audioCommand = youtubeCommands.find(command => command.name === "yta");
+      if (!audioCommand) {
+        throw new Error("YouTube audio command is unavailable");
       }
-      
-      const buffer = await dlBuffer(data.downloadURL);
-      
-      const caption = [
-        "╔═|〔  PLAY MUSIC 〕",
-        "║",
-        "║ ▸ *Track*   : " + trunc(data.title),
-        "║ ▸ *Quality* : 128kbps",
-        "║ ▸ *Size*    : " + fmtSize(buffer.length),
-        "║",
-        "╚═|〔 " + _0x48a4b6 + " 〕"
-      ].join("\n");
-      
-      await _0x257fb7.sendMessage(
-        _0x227982,
-        {
-          document: buffer,
-          mimetype: "audio/mpeg",
-          fileName: (data.title.replace(/[^\w\s-]/g, "").trim() || "audio") + ".mp3",
-          caption
-        },
-        {
-          quoted: _0x38eb72
-        }
-      );
+      return await audioCommand.execute(_0x257fb7, _0x38eb72, [url], _0x45e1a4, _0x3b2277);
       
     } catch (_0x149386) {
       await _0x257fb7.sendMessage(

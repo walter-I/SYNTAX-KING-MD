@@ -4,17 +4,23 @@ const fs   = require('fs');
 const path = require('path');
 const { getBotName } = require('../../lib/botname');
 
-const CONFIG_FILE = path.join(__dirname, '../../data/antiviewonce_config.json');
+const CONFIG_FILE = path.join(__dirname, '../../data/antiviewonce/config.json');
 
 function loadConfig() {
-    try { return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')); } catch { return {}; }
+    if (typeof globalThis._loadAntiViewOnceConfig === 'function') {
+        return globalThis._loadAntiViewOnceConfig();
+    }
+    try {
+        return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+    } catch (error) {
+        if (error.code === 'ENOENT') return {};
+        throw error;
+    }
 }
 
 function saveConfig(cfg) {
-    try {
-        fs.mkdirSync(path.dirname(CONFIG_FILE), { recursive: true });
-        fs.writeFileSync(CONFIG_FILE, JSON.stringify(cfg, null, 2));
-    } catch {}
+    fs.mkdirSync(path.dirname(CONFIG_FILE), { recursive: true });
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(cfg, null, 2));
 }
 
 module.exports = {
@@ -33,18 +39,18 @@ module.exports = {
         const sub   = (args[0] || '').toLowerCase();
 
         if (!sub || sub === 'status') {
-            const status = cfg.enabled ? '✅ ON' : '❌ OFF';
-            const mode   = cfg.mode || 'private';
+            const statusLines = cfg.gc && cfg.pm
+                ? [`║ ▸ *Groups* : ${cfg.gc.enabled ? '✅ ON' : '❌ OFF'}`, `║ ▸ *DMs*    : ${cfg.pm.enabled ? '✅ ON' : '❌ OFF'}`]
+                : [`║ ▸ *Status* : ${cfg.enabled ? '✅ ON' : '❌ OFF'}`];
             return sock.sendMessage(chatId, {
                 text: [
                     `╔═|〔  ANTI VIEWONCE 〕`,
                     `║`,
-                    `║ ▸ *Status* : ${status}`,
-                    `║ ▸ *Mode*   : ${mode}`,
+                    ...statusLines,
+                    `║ ▸ *Delivery* : privately to sender`,
                     `║`,
                     `║ ▸ *Usage*`,
                     `║   ${prefix}av on/off`,
-                    `║   ${prefix}av mode private|group`,
                     `║`,
                     `╚═|〔 ${name} 〕`
                 ].join('\n')
@@ -53,28 +59,16 @@ module.exports = {
 
         if (sub === 'on' || sub === 'off') {
             cfg.enabled = sub === 'on';
+            if (cfg.gc && typeof cfg.gc === 'object') cfg.gc.enabled = cfg.enabled;
+            if (cfg.pm && typeof cfg.pm === 'object') cfg.pm.enabled = cfg.enabled;
             saveConfig(cfg);
             return sock.sendMessage(chatId, {
                 text: `╔═|〔  ANTI VIEWONCE 〕\n║\n║ ▸ *Status* : ${cfg.enabled ? '✅ Enabled' : '❌ Disabled'}\n║\n╚═|〔 ${name} 〕`
             }, { quoted: msg });
         }
 
-        if (sub === 'mode' && args[1]) {
-            const m = args[1].toLowerCase();
-            if (!['private', 'group', 'both'].includes(m)) {
-                return sock.sendMessage(chatId, {
-                    text: `╔═|〔  ANTI VIEWONCE 〕\n║\n║ ▸ *Error* : Mode must be private, group or both\n║\n╚═|〔 ${name} 〕`
-                }, { quoted: msg });
-            }
-            cfg.mode = m;
-            saveConfig(cfg);
-            return sock.sendMessage(chatId, {
-                text: `╔═|〔  ANTI VIEWONCE 〕\n║\n║ ▸ *Mode* : ✅ Set to ${m}\n║\n╚═|〔 ${name} 〕`
-            }, { quoted: msg });
-        }
-
         await sock.sendMessage(chatId, {
-            text: `╔═|〔  ANTI VIEWONCE 〕\n║\n║ ▸ *Usage* : ${prefix}av on | off | mode private|group|both\n║\n╚═|〔 ${name} 〕`
+            text: `╔═|〔  ANTI VIEWONCE 〕\n║\n║ ▸ *Usage* : ${prefix}av on | off\n║ ▸ *Delivery* : privately to the sender\n║\n╚═|〔 ${name} 〕`
         }, { quoted: msg });
     }
 };

@@ -8,6 +8,7 @@ const {
 const {
   getBotName
 } = require("../../lib/botname");
+const { downloadWithYtDlp } = require("../../lib/youtube-dlp");
 const KEITH_AUDIO = ["/download/ytmp3", "/download/audio", "/download/dlmp3", "/download/mp3", "/download/yta", "/download/yta2", "/download/yta3", "/download/yta4", "/download/yta5"];
 const KEITH_VIDEO = ["/download/ytmp4", "/download/video", "/download/dlmp4", "/download/mp4", "/download/ytv", "/download/ytv2", "/download/ytv3", "/download/ytv4", "/download/ytv5"];
 async function tryCasperAudio(_0x1ba6c2) {
@@ -195,29 +196,53 @@ async function ytDownload(_0x4ae613, _0x37f0a5, _0x468f83, _0x312f1c, _0x5c30d2,
       let _0x16293b;
       let _0x4bf884;
       let _0x39dc17;
-      const _0x213d0f = await tryCasperAudio(_0xf95edf);
-      if (_0x213d0f) {
-        _0x16293b = await dlBuffer(_0x213d0f.dlUrl);
-        _0x4bf884 = _0x213d0f.title;
-        _0x39dc17 = _0x213d0f.quality;
-      } else {
-        const _0x27dcca = await keithTry(KEITH_AUDIO, {
-          url: _0xf95edf
-        });
-        const _0x4c1d98 = extractUrl(_0x27dcca.result);
-        if (!_0x4c1d98) {
-          throw new Error("All audio APIs failed");
+      let _audioApiError;
+      try {
+        const _0x213d0f = await tryCasperAudio(_0xf95edf);
+        if (_0x213d0f) {
+          _0x16293b = await dlBuffer(_0x213d0f.dlUrl);
+          _0x4bf884 = _0x213d0f.title;
+          _0x39dc17 = _0x213d0f.quality;
         }
-        _0x16293b = await dlBuffer(_0x4c1d98);
-        _0x16293b = await convertTo128kbps(_0x16293b);
-        _0x4bf884 = "audio";
-        _0x39dc17 = "128kbps";
+      } catch (_error) {
+        _audioApiError = _error;
+      }
+      if (!_0x16293b) {
+        try {
+          const _fallback = await keithTry(KEITH_AUDIO, { url: _0xf95edf });
+          const _fallbackUrl = extractUrl(_fallback.result);
+          if (!_fallbackUrl) throw new Error("No download URL returned");
+          _0x16293b = await dlBuffer(_fallbackUrl);
+          _0x16293b = await convertTo128kbps(_0x16293b);
+          _0x4bf884 = "audio";
+          _0x39dc17 = "128kbps";
+        } catch (_apiError) {
+          _audioApiError = _apiError;
+          try {
+            const _local = await downloadWithYtDlp(_0xf95edf, "audio");
+            _0x16293b = _local.buffer;
+            _0x4bf884 = _local.title;
+            _0x39dc17 = _local.ext.toUpperCase();
+          } catch (_localError) {
+            throw new Error(`All audio sources failed. API: ${_audioApiError.message}. yt-dlp: ${_localError.message}`);
+          }
+        }
       }
       const _0x3c54d8 = "╔═|〔  YOUTUBE AUDIO 〕\n║\n║ ▸ *Track*   : " + _0x4bf884 + "\n║ ▸ *Quality* : " + _0x39dc17 + "\n║ ▸ *Size*    : " + (_0x16293b.length / 1024 / 1024).toFixed(2) + " MB\n║\n╚═|〔 " + _0x546c10 + " 〕";
+      const _audioExt = _0x39dc17 === "M4A" || _0x39dc17 === "WEBM" || _0x39dc17 === "OPUS"
+        ? _0x39dc17.toLowerCase()
+        : "mp3";
+      const _audioMime = _audioExt === "m4a"
+        ? "audio/mp4"
+        : _audioExt === "webm"
+          ? "audio/webm"
+          : _audioExt === "opus"
+            ? "audio/ogg"
+            : "audio/mpeg";
       await _0x4ae613.sendMessage(_0x344bba, {
         document: _0x16293b,
-        mimetype: "audio/mpeg",
-        fileName: _0x4bf884 + ".mp3",
+        mimetype: _audioMime,
+        fileName: (_0x4bf884.replace(/[^\w\s-]/g, "").trim() || "audio") + "." + _audioExt,
         caption: _0x3c54d8
       }, {
         quoted: _0x37f0a5
@@ -226,22 +251,40 @@ async function ytDownload(_0x4ae613, _0x37f0a5, _0x468f83, _0x312f1c, _0x5c30d2,
       let _0x12716a;
       let _0x258c65;
       let _0x5a3cbf;
-      const _0x1a7b69 = await tryCasperVideo(_0xf95edf);
-      if (_0x1a7b69) {
-        _0x12716a = await dlBuffer(_0x1a7b69.dlUrl);
-        _0x258c65 = _0x1a7b69.title;
-        _0x5a3cbf = _0x1a7b69.quality;
-      } else {
-        const _0x47421c = await keithTry(KEITH_VIDEO, {
-          url: _0xf95edf
-        });
-        const _0x539f73 = extractUrl(_0x47421c.result);
-        if (!_0x539f73) {
-          throw new Error("All video APIs failed");
+      let _videoApiError;
+      try {
+        const _0x1a7b69 = await tryCasperVideo(_0xf95edf);
+        if (_0x1a7b69) {
+          _0x12716a = await dlBuffer(_0x1a7b69.dlUrl);
+          _0x258c65 = _0x1a7b69.title;
+          _0x5a3cbf = _0x1a7b69.quality;
         }
-        _0x12716a = await dlBuffer(_0x539f73);
-        _0x258c65 = "video";
-        _0x5a3cbf = "HD";
+      } catch (_error) {
+        _videoApiError = _error;
+      }
+      if (!_0x12716a) {
+        try {
+          const _0x47421c = await keithTry(KEITH_VIDEO, {
+            url: _0xf95edf
+          });
+          const _0x539f73 = extractUrl(_0x47421c.result);
+          if (!_0x539f73) {
+            throw new Error("No download URL returned");
+          }
+          _0x12716a = await dlBuffer(_0x539f73);
+          _0x258c65 = "video";
+          _0x5a3cbf = "HD";
+        } catch (_apiError) {
+          _videoApiError = _apiError;
+          try {
+            const _local = await downloadWithYtDlp(_0xf95edf, "video");
+            _0x12716a = _local.buffer;
+            _0x258c65 = _local.title;
+            _0x5a3cbf = _local.ext.toUpperCase();
+          } catch (_localError) {
+            throw new Error(`All video sources failed. API: ${_videoApiError.message}. yt-dlp: ${_localError.message}`);
+          }
+        }
       }
       const _0x27a1fe = "╔═|〔  YOUTUBE VIDEO 〕\n║\n║ ▸ *Title*   : " + _0x258c65 + "\n║ ▸ *Quality* : " + _0x5a3cbf + "\n║ ▸ *Size*    : " + (_0x12716a.length / 1024 / 1024).toFixed(2) + " MB\n║\n╚═|〔 " + _0x546c10 + " 〕";
       await _0x4ae613.sendMessage(_0x344bba, {
@@ -269,7 +312,7 @@ module.exports = [{
   }
 }, {
   name: "ytv",
-  aliases: ["ytvideo", "ytmp4", "youtubevideo"],
+  aliases: ["video", "ytvideo", "ytmp4", "youtubevideo"],
   description: "Download YouTube video (MP4)",
   category: "download",
   async execute(_0xbad258, _0x26e804, _0x7b5ea6, _0xb2f4a2, _0x3b40b5) {

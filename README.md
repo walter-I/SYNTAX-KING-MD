@@ -26,6 +26,25 @@
 
   <br><br>
 
+  ## 🎵 YOUTUBE DOWNLOADS
+
+  The `.song`, `.yta`, and `.video` commands use yt-dlp as a fallback when a download API is unavailable. The launcher installs the pinned bgutil PO-token plugin. On the same Linux VPS as the bot, start the provider from the repository root:
+
+  ```sh
+  docker compose -f deploy/bgutil/docker-compose.yml up -d
+  ```
+
+  The Compose file binds the provider to `127.0.0.1:4416` only; do not change this to `0.0.0.0` or publish the unauthenticated provider to the public internet. Add these settings to the bot's root `.env` and restart the bot:
+
+  ```env
+  YOUTUBE_POT_PROVIDER_URL=http://127.0.0.1:4416
+  YT_DLP_JS_RUNTIME=/path/to/node-22-or-newer
+  ```
+
+  `YT_DLP_JS_RUNTIME` must point to a Node.js 22+ executable for yt-dlp's YouTube JavaScript challenges. The bot itself can continue using its existing Node.js version. Check the service with `curl http://127.0.0.1:4416/ping`; the provider image uses Node.js 22+ and is pinned to 2.0.2 to match the installed plugin. PO tokens may not resolve IP-based YouTube restrictions, so HTTP 403 can still occur.
+
+  <br><br>
+
   ## 🚀 DEPLOY SYNTAX-KING-MD
 
   <a href="https://dashboard.heroku.com/new?template=https://github.com/yourusername/SYNTAX-KING-MD">
@@ -67,28 +86,28 @@
   ## 🔗 IMPORTANT LINKS
 
   📡 Support Channel:  
-  <a href="https://example.com/support">
+  <a href="https://t.me/+AimiJWPsKO9kOTQ0">
     <img src="https://img.shields.io/badge/TELEGRAM-CHANNEL-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white"/>
   </a>
 
   <br><br>
 
   📢 WhatsApp Channel:  
-  <a href="https://example.com/channel">
+<a href=" https://whatsapp.com/channel/0029VbDLKgLAO7RKem8cAn1D">
     <img src="https://img.shields.io/badge/WHATSAPP-CHANNEL-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
   </a>
 
   <br><br>
 
   💬 WhatsApp Group:  
-  <a href="https://example.com/group">
+  <a href="https://chat.whatsapp.com/LwvhCXPsNJp3osuBsi5ctm?s=cl&p=a&ilr=1">
     <img src="https://img.shields.io/badge/WHATSAPP-GROUP-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
   </a>
 
   <br><br>
 
   🤖 WhatsApp Chat:  
-  <a href="https://example.com/chat">
+  <a href="https://wa.me/254768266922">
     <img src="https://img.shields.io/badge/WHATSAPP-CHAT-128C7E?style=for-the-badge&logo=whatsapp&logoColor=white"/>
   </a>
 

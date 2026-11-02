@@ -10,6 +10,9 @@ const { spawn } = require('child_process');
 const BOT_DIR    = path.join(__dirname, 'bot');
 const YT_DLP     = path.join(BOT_DIR, 'yt-dlp');
 const YT_DLP_URL = 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp';
+const YT_DLP_PLUGIN_URL = 'https://github.com/Brainicism/bgutil-ytdlp-pot-provider/releases/download/2.0.2/bgutil-ytdlp-pot-provider.zip';
+const YT_DLP_PLUGIN_SHA256 = 'a26b980bf6d8e8400d8f21445daa4d8381bf6183d20f0be309391f86b31e27ef';
+const YT_DLP_PLUGIN_DIR = path.join(BOT_DIR, 'yt-dlp-plugins');
 
 // ── PID lock file — prevents duplicate launcher instances ────────────────────
 const LOCK_FILE = path.join(__dirname, '.launcher.pid');
@@ -80,7 +83,12 @@ function download(url, dest) {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(dest);
     const get  = (u) => https.get(u, (res) => {
-      if (res.statusCode === 301 || res.statusCode === 302) return get(res.headers.location);
+      if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) return get(res.headers.location);
+      if (res.statusCode !== 200) {
+        res.resume();
+        file.close(() => fs.unlink(dest, () => reject(new Error(`Download returned HTTP ${res.statusCode}`))));
+        return;
+      }
       res.pipe(file);
       file.on('finish', () => file.close(resolve));
     }).on('error', (err) => { fs.unlink(dest, () => {}); reject(err); });
@@ -94,6 +102,30 @@ async function ensureYtDlp() {
   await download(YT_DLP_URL, YT_DLP);
   fs.chmodSync(YT_DLP, '755');
   console.log('[launcher] yt-dlp ready.');
+}
+
+async function ensureYtDlpPlugin() {
+  const pluginRoot = path.join(YT_DLP_PLUGIN_DIR, 'bgutil');
+  const pluginEntry = path.join(pluginRoot, 'yt_dlp_plugins', 'extractor', 'getpot_bgutil_http.py');
+  if (fs.existsSync(pluginEntry)) return;
+
+  const archive = path.join(BOT_DIR, '.bgutil-ytdlp-pot-provider.zip');
+  console.log('[launcher] Installing pinned yt-dlp PO-token provider plugin...');
+  try {
+    await download(YT_DLP_PLUGIN_URL, archive);
+    const hash = require('crypto').createHash('sha256').update(fs.readFileSync(archive)).digest('hex');
+    if (hash !== YT_DLP_PLUGIN_SHA256) {
+      throw new Error('PO-token plugin checksum verification failed');
+    }
+    fs.mkdirSync(pluginRoot, { recursive: true });
+    require('child_process').execFileSync('tar', ['-xf', archive, '-C', pluginRoot], { stdio: 'inherit' });
+    if (!fs.existsSync(pluginEntry)) {
+      throw new Error('PO-token plugin archive did not contain the expected plugin');
+    }
+    console.log('[launcher] PO-token provider plugin ready.');
+  } finally {
+    if (fs.existsSync(archive)) fs.unlinkSync(archive);
+  }
 }
 
 // ── Bot child manager ────────────────────────────────────────────────────────
@@ -144,4 +176,5 @@ function ensureDeps() {
 acquireLock();
 ensureDeps()
   .then(() => ensureYtDlp().catch((err) => console.error('[launcher] yt-dlp download failed:', err.message)))
+  .then(() => ensureYtDlpPlugin().catch((err) => console.error('[launcher] PO-token plugin install failed:', err.message)))
   .finally(startBot);
