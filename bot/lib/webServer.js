@@ -25,25 +25,27 @@ const PAGE = `<!doctype html>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <title>Bot device pairing</title>
+  <title>SYNTAX KING MD | Device Pairing</title>
   <style>
-    :root{color-scheme:dark;font:16px system-ui,sans-serif;background:#101820;color:#eef4f7}
+    :root{color-scheme:dark;font:16px system-ui,sans-serif;background:#062b1d;color:#eefaf2}
     body{max-width:560px;margin:6vh auto;padding:24px}
-    main{background:#1b2933;border:1px solid #334956;border-radius:16px;padding:24px}
-    h1{font-size:1.55rem;margin-top:0}p{line-height:1.5;color:#cad7dd}
+    main{background:#0d3b29;border:1px solid #247a50;border-radius:16px;padding:24px;box-shadow:0 18px 55px #03170f99}
+    .brand{margin:0 0 8px;color:#75e0a4;font-size:.82rem;font-weight:800;letter-spacing:.18em}
+    h1{font-size:1.55rem;margin-top:0}p{line-height:1.5;color:#d1eadb}
     label{display:block;margin:16px 0 6px}
-    input,select,button{box-sizing:border-box;width:100%;padding:12px;border-radius:8px;border:1px solid #526976;background:#101820;color:#fff}
-    button{margin-top:16px;background:#1f9d70;border:0;font-weight:700;cursor:pointer}
+    input,select,button{box-sizing:border-box;width:100%;padding:12px;border-radius:8px;border:1px solid #43845f;background:#082a1d;color:#fff}
+    button{margin-top:16px;background:#21a45d;border:0;font-weight:700;cursor:pointer}
     button:disabled{opacity:.55;cursor:wait}
     #pairing{display:none;margin-top:24px;text-align:center}
     #qr{max-width:100%;background:#fff;padding:12px;border-radius:12px}
     #code{font-size:2rem;letter-spacing:.16em;font-weight:800}
     #message{min-height:1.5em;color:#9be2c4}
-    .warning{font-size:.9rem;color:#ffd58b}
+    .warning{font-size:.9rem;color:#ffe09a}
   </style>
 </head>
 <body>
   <main>
+    <p class="brand">SYNTAX KING MD</p>
     <h1>Link a WhatsApp device</h1>
     <p>Sign in with the pairing admin password configured on your bot service. Never share the QR code or pairing code; they authorize a device link.</p>
     <form id="login">
