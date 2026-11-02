@@ -757,7 +757,9 @@ const {
 const banCommand = require("./syntax-cmds/group/ban.js");
 const {
   setupWebServer,
-  updateWebStatus
+  updateWebStatus,
+  setPairingState,
+  getPairingStage
 } = require("./lib/webServer.js");
 
 // Pre-imported group event modules (avoids dynamic import disk I/O in hot event handlers)
@@ -4980,10 +4982,21 @@ async function startBot(loginMode = "auto", loginData = null) {
         lastDisconnect,
         qr
       } = update;
+      if (qr) {
+        setPairingState({
+          stage: "qr",
+          qr,
+          code: null,
+          message: "Scan this QR code from WhatsApp → Linked devices."
+        });
+      } else if (connection === "connecting" && ["idle", "error", "starting"].includes(getPairingStage())) {
+        setPairingState({ stage: "waiting", qr: null, code: null });
+      }
       if (connection) {
         UltraCleanLogger.info(`🔗 Connection update: ${connection}`);
       }
       if (connection === "open") {
+        setPairingState({ stage: "connected" });
         isConnected = true;
         connectionOpenTime = Date.now();
         globalThis._botConnectionOpenTime = connectionOpenTime;
@@ -5239,6 +5252,9 @@ async function startBot(loginMode = "auto", loginData = null) {
       }
       if (connection === "close") {
         isConnected = false;
+        if (["starting", "waiting", "qr", "code"].includes(getPairingStage())) {
+          setPairingState({ stage: "error", message: "Connection closed before pairing completed." });
+        }
         updateWebStatus({
           connected: false
         });
@@ -5290,8 +5306,14 @@ async function startBot(loginMode = "auto", loginData = null) {
               if (cleanCode.length === 8) {
                 formattedCode = `${cleanCode.substring(0, 4)}-${cleanCode.substring(4, 8)}`;
               }
-              console.clear();
-              console.log(chalk.greenBright(`
+              setPairingState({
+                stage: "code",
+                code: formattedCode,
+                message: "Enter this code in WhatsApp → Linked devices → Link with phone number."
+              });
+              if (process.stdout.isTTY && !process.env.PAIRING_ADMIN_PASSWORD) {
+                console.clear();
+                console.log(chalk.greenBright(`
 ╔══════════════════════════════════════════════════════════════════════╗
 ║                    🔗 PAIRING CODE - ${getCurrentBotName()}                    ║
 ╠══════════════════════════════════════════════════════════════════════╣
@@ -5324,6 +5346,7 @@ async function startBot(loginMode = "auto", loginData = null) {
               setTimeout(() => {
                 clearInterval(timerInterval);
               }, 610000);
+              }
             } catch (error) {
               if (attempt < 3) {
                 UltraCleanLogger.warning(`Pairing code attempt ${attempt} failed, retrying...`);
@@ -5332,6 +5355,7 @@ async function startBot(loginMode = "auto", loginData = null) {
               } else {
                 console.log(chalk.red("\n❌ Max retries reached. Restarting bot..."));
                 UltraCleanLogger.error(`Pairing code error: ${error.message}`);
+                setPairingState({ stage: "error", message: "Could not obtain a pairing code. Try again." });
                 setTimeout(async () => {
                   await startBot(loginMode, loginData);
                 }, 8000);
@@ -8566,7 +8590,14 @@ async function main() {
     prefixCache = loadPrefixFromFiles();
     isPrefixless = prefixCache === "" ? true : false;
     printStartupBox();
-    await setupWebServer();
+    await setupWebServer({
+      startPairing: ({ method, phone }) => {
+        if (isConnected || getPairingStage() === "connected") {
+          throw new Error("The bot already has an active WhatsApp connection.");
+        }
+        return startBot(method === "code" ? "pair" : "auto", method === "code" ? phone : null);
+      }
+    });
     setupHerokuKeepAlive();
     DiskManager.start();
 

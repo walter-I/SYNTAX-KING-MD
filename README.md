@@ -19,10 +19,15 @@
 
   ## 🔑 SESSION & SETUP
 
-  👉 Get your Session ID here:  
-  <a href="https://example.com/session-generator/?utm_source=chatgpt.com">
-    <img src="https://img.shields.io/badge/SESSION-GENERATOR-blue?style=for-the-badge&logo=render&logoColor=white"/>
-  </a>
+  Pair this bot from the password-protected HTTPS page on your deployed service. The pairing page links WhatsApp directly to the running bot; it does not produce a transferable `SESSION_ID`.
+
+  <br><br>
+
+  ## 🔐 ONLINE WHATSAPP PAIRING
+
+  The Render-hosted web server includes a password-protected pairing page at the service root. Generate a random password locally (for example, `openssl rand -hex 32`), save it as `PAIRING_ADMIN_PASSWORD` in Render's environment settings, deploy the bot, then open its HTTPS `onrender.com` address and sign in. The page can request a phone pairing code or display a QR code. Use the code/QR only in WhatsApp's **Linked devices** screen.
+
+  Pairing credentials are saved by the bot on its own persistent storage; the page does not display or export a reusable `SESSION_ID`. Attach a Render persistent disk mounted at `/opt/render/project/src/bot/session` before pairing, and keep the service restricted to your own use. Do not share the admin password, QR code, or pairing code. Use HTTPS only.
 
   <br><br>
 
